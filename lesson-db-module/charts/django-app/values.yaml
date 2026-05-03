@@ -1,0 +1,28 @@
+replicaCount: 1
+
+image:
+  repository: 000000000000.dkr.ecr.eu-north-1.amazonaws.com/krav-yurii-lesson-db-module-ecr
+  pullPolicy: Always
+  tag: 4
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 70
+
+configMap:
+  ALLOWED_HOSTS: "*"
+  DB_ENGINE: django.db.backends.sqlite3
+  DB_HOST: localhost
+  DB_PORT: 5432
+  DB_USER: kravyurii
+  DB_NAME: kravyuriiapp
+
+secret:
+  DB_PASSWORD: ""  # Override: --set secret.DB_PASSWORD=yourpassword

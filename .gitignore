@@ -1,1 +1,11 @@
 .idea
+__pycache__/
+*.pyc
+.env
+postgres_data/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+crash.log

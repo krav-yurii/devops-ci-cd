@@ -4,6 +4,10 @@ resource "aws_ecr_repository" "main" {
   name                 = var.ecr_name
   image_tag_mutability = "MUTABLE"
 
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
+
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
   }
@@ -12,6 +16,41 @@ resource "aws_ecr_repository" "main" {
     Name        = var.ecr_name
     Environment = "lesson-5"
   }
+}
+
+resource "aws_ecr_lifecycle_policy" "main" {
+  repository = aws_ecr_repository.main.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep only 10 tagged images"
+        selection = {
+          tagStatus     = "tagged"
+          tagPatternList = ["*"]
+          countType     = "imageCountMoreThan"
+          countNumber   = 10
+        }
+        action = {
+          type = "expire"
+        }
+      },
+      {
+        rulePriority = 2
+        description  = "Delete untagged images older than 7 days"
+        selection = {
+          tagStatus   = "untagged"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = 7
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_ecr_repository_policy" "main" {
